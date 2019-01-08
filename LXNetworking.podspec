@@ -21,7 +21,6 @@ Pod::Spec.new do |s|
     s.requires_arc = true
     s.source_files = 'LXNetworking/*.{h,m}'
     s.public_header_files = 'LXNetworking/*.{h}'
-    s.frameworks = 'UIKit', 'CoreFoundation'
     s.dependency 'AFNetworking'
     s.dependency 'PINCache'
 
