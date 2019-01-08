@@ -169,5 +169,5 @@ configuration.resultCacheDuration = 100000;```
 
 ## 如何使用
 ```
-pod "LXNetworking"
+pod 'LXNetworking'
 ```
