@@ -1,4 +1,4 @@
-# LXNeyworking
+# LXNetworking
 > 基于AFNetworking的v3.2.1进行网络请求，基于PINCache进行网络数据缓存，支持清除指定url缓存、url及参数组合缓存，通过AFNetworkActivityLogger进行网络log打印。该代码使用灵活的请求方式，不包含任何业务代码，上层支持集中式、分布式网络接口管理方式，在请求前可以对请求进行配置，也支持对网络请求后返回的数据进行统一处理。
 
 ### 一、实现功能
