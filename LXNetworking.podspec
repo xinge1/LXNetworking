@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
 
     s.name         = "LXNetworking"
-    s.version      = "1.0.1"
+    s.version      = "1.0.2"
     s.ios.deployment_target = '10.0'
     s.summary      = "好用网络请求库，基于AFNetworking v3.2.1。提供常用请求，上传，下载。缓存，设置缓存策略，缓存时间等功能"
     s.homepage     = "https://github.com/xinge1/LXNetworking"
