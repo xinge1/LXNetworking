@@ -1,0 +1,38 @@
+PODS:
+  - AFNetworking (3.2.1):
+    - AFNetworking/NSURLSession (= 3.2.1)
+    - AFNetworking/Reachability (= 3.2.1)
+    - AFNetworking/Security (= 3.2.1)
+    - AFNetworking/Serialization (= 3.2.1)
+    - AFNetworking/UIKit (= 3.2.1)
+  - AFNetworking/NSURLSession (3.2.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (3.2.1)
+  - AFNetworking/Security (3.2.1)
+  - AFNetworking/Serialization (3.2.1)
+  - AFNetworking/UIKit (3.2.1):
+    - AFNetworking/NSURLSession
+  - LXNetworking (1.0.3):
+    - AFNetworking
+    - PINCache
+  - PINCache (2.3)
+
+DEPENDENCIES:
+  - LXNetworking
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - AFNetworking
+    - LXNetworking
+    - PINCache
+
+SPEC CHECKSUMS:
+  AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
+  LXNetworking: 71de8bb5703c5a16c19e72e0a00513d69a02cbc4
+  PINCache: ce36ed282031b92fc7733ffe831f474ff80fddc2
+
+PODFILE CHECKSUM: 135aa49576a19c1d3a34505693f438f23897a650
+
+COCOAPODS: 1.5.3
