@@ -17,7 +17,7 @@ const CGFloat LXRequestTimeoutInterval = 10.0f;
     self = [super init];
     if (self) {
         _timeoutInterval = LXRequestTimeoutInterval;
-        _requestCachePolicy = LXRequestReturnCacheDontLoad;
+        _requestCachePolicy = LXRequestReturnCacheOrLoadToCache;
         _LXError = [LXError class];
         _resultCacheDuration = 86400;
     }
@@ -42,6 +42,7 @@ const CGFloat LXRequestTimeoutInterval = 10.0f;
 - (instancetype)copyWithZone:(NSZone *)zone {
     LXNetworkingConfig *configuration = [[LXNetworkingConfig alloc] init];
     configuration.resultCacheDuration = self.resultCacheDuration;
+    configuration.requestCachePolicy = self.requestCachePolicy;
     configuration.baseURL = [self.baseURL copy];
     configuration.builtinHeaders = [self.builtinHeaders copy];
     configuration.builtinBodys = [self.builtinBodys copy];

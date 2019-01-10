@@ -9,7 +9,7 @@
 #import "LXNetworkingManager.h"
 #import "LXNetworkingConfig.h"
 #import "LXError.h"
-#import <PINCache/PINCache.h>
+#import "LXNetworkCache.h"
 
 NSString * const LXDNetworkCacheSharedName = @"LXDNetworkCacheSharedName";
 NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
@@ -20,11 +20,6 @@ NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
  是AFURLSessionManager的子类，为HTTP的一些请求提供了便利方法，当提供baseURL时，请求只需要给出请求的路径即可
  */
 @property (nonatomic, strong) AFHTTPSessionManager *requestManager;
-
-/**
- 保存网络请求返回数据
- */
-@property (nonatomic, strong) PINCache *cache;
 
 /**
  将LXRequestMethod（NSInteger）类型转换成对应的方法名（NSString）
@@ -68,7 +63,6 @@ NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
         [[AFNetworkActivityLogger sharedLogger] setLevel:AFLoggerLevelInfo];
         [[AFNetworkActivityLogger sharedLogger] startLogging];
         
-        self.cache = [[PINCache alloc] initWithName:LXDNetworkCacheSharedName];
         self.configuration = [[LXNetworkingConfig alloc] init];
         
         _methodMap = @{
@@ -79,7 +73,6 @@ NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
                        @"4" : @"PATCH",
                        @"5" : @"DELETE",
                        };
-        _cacheKeys = [self.cache objectForKey:LXDNetworkCacheKeys];
         if (!_cacheKeys) {
             _cacheKeys = [NSMutableDictionary dictionary];
         }
@@ -132,20 +125,19 @@ NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
                                          success:(LXRequestManagerSuccess _Nullable )success
                                          failure:(LXRequestManagerFailure _Nullable )failure {
     LXNetworkingConfig *configuration = [self disposeConfiguration:configurationHandler];
+    if (!URLString) {
+        URLString = @"";
+    }
     NSString *requestUrl = [[NSURL URLWithString:URLString relativeToURL:[NSURL URLWithString:configuration.baseURL]] absoluteString];
     parameters = [self disposeRequestParameters:parameters];
     
-    //PINCache 取数据
-    NSString *cacheKey = [requestUrl stringByAppendingString:[self serializeParams:parameters]];
+    //获取缓存数据
+//    NSString *cacheKey = [requestUrl stringByAppendingString:[self serializeParams:parameters]];
     id (^ fetchCacheRespose)(void) = ^id (void) {
-        if ([self verifyInvalidCache:cacheKey]) {
-            id resposeObject = [self.cache objectForKey:cacheKey];
-            if (resposeObject) {
-                if (configuration.resposeHandle) {
-                    resposeObject = configuration.resposeHandle(nil, resposeObject);
-                }
-                return resposeObject;
-            }
+        
+       id resposeObject = [LXNetworkCache httpCacheForURL:requestUrl parameters:parameters cacheValidTime:configuration.resultCacheDuration];
+        if (resposeObject) {
+            return resposeObject;
         }
         return nil;
     };
@@ -165,12 +157,10 @@ NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
         }
     }
     
-    //PINCache 存数据
+    //存数据
     void (^ saveCacheRespose)(id responseObject) = ^(id responseObject) {
         if (configuration.resultCacheDuration > 0) {
-            [self setCacheInvalidTimeWithCacheKey:cacheKey resultCacheDuration:configuration.resultCacheDuration];
-            [self.cache setObject:responseObject forKey:cacheKey];
-            [self addCacheKey:cacheKey atRequestUrl:requestUrl];
+            [LXNetworkCache setHttpCache:responseObject URL:requestUrl parameters:parameters];
         }
     };
     
@@ -316,54 +306,6 @@ NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
     [self.requestManager invalidateSessionCancelingTasks:YES];
 }
 
-/**
- 清除指定本地的网络缓存数据
- 
- @param urlString 网络请求的url，删除该urlString下所有的缓存（无视parameters参数）
- */
-- (void)clearRequestCache:(NSString *_Nullable)urlString {
-    [self clearRequestCache:urlString identifier:nil];
-}
-
-/**
- 清除指定本地的网络缓存数据
- 
- @param urlString 网络请求的url
- @param identifier 该次请求的唯一表示id，比如楼盘id、个人信息id （可以不写，则删除该urlString下所有的缓存）
- */
-- (void)clearRequestCache:(NSString *_Nullable)urlString identifier:(NSString *_Nullable)identifier {
-    NSString *requestUrl = [[NSURL URLWithString:urlString relativeToURL:[NSURL URLWithString:_configuration.baseURL]] absoluteString];
-    if (!requestUrl) {
-        return ;
-    }
-    
-    if (identifier) {
-        NSMutableSet *cacheKeys = self.cacheKeys[requestUrl];
-        [cacheKeys enumerateObjectsUsingBlock:^(NSString* _Nonnull obj, BOOL * _Nonnull stop) {
-            if ([obj containsString:identifier]) {
-                [self removeCacheKey:obj atRequestUrl:requestUrl];
-                *stop = YES;
-            }
-        }];
-    }
-    else {
-        NSMutableSet *cacheKeys = self.cacheKeys[requestUrl];
-        [cacheKeys enumerateObjectsUsingBlock:^(NSString* _Nonnull obj, BOOL * _Nonnull stop) {
-            [self removeCacheKey:obj atRequestUrl:requestUrl];
-        }];
-    }
-}
-
-
-/**
- 清除所有本地的网络缓存数据
- */
-- (void)clearAllCache {
-    [_cacheKeys removeAllObjects];
-    [_cache removeAllObjects];
-}
-
-
 #pragma mark - 内部方法
 - (NSDictionary *)disposeRequestParameters:(NSDictionary *)parameters {
     NSMutableDictionary *bodys = [NSMutableDictionary dictionaryWithDictionary:parameters];
@@ -413,72 +355,6 @@ NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
     }
     return @"";
 }
-
-- (BOOL)verifyInvalidCache:(NSString *)cacheKey {
-    //获取该次请求失效的时间戳
-    NSString *cacheDurationKey = [NSString stringWithFormat:@"%@_cacheDurationKey", cacheKey];
-    NSTimeInterval invalidTime = [[self.cache objectForKey:cacheDurationKey] doubleValue];
-    NSTimeInterval nowTime = [[NSDate date] timeIntervalSince1970];
-    if (invalidTime > nowTime) {
-        return YES;
-    }
-    return NO;
-}
-
-- (void)setCacheInvalidTimeWithCacheKey:(NSString *)cacheKey resultCacheDuration:(NSTimeInterval )resultCacheDuration{
-    NSString *cacheDurationKey = [NSString stringWithFormat:@"%@_cacheDurationKey", cacheKey];
-    NSTimeInterval nowTime = [[NSDate date] timeIntervalSince1970];
-    NSTimeInterval invalidTime = nowTime + resultCacheDuration;
-    [self.cache setObject:@(invalidTime) forKey:cacheDurationKey];
-}
-
-
-/**
- 在requestUrl这个集合中添加新的cacheKey进行保存
- 
- @param cacheKey 该次请求完整的url
- @param requestUrl 请求的url，包含baseUrl和urlString
- */
-- (void)addCacheKey:(NSString *)cacheKey atRequestUrl:(NSString *)requestUrl {
-    if (!cacheKey || !requestUrl) {
-        return ;
-    }
-    NSMutableSet *cacheKeys = self.cacheKeys[requestUrl];
-    if (!cacheKeys) {
-        cacheKeys = [NSMutableSet set];
-    }
-    [cacheKeys addObject:cacheKey];
-    self.cacheKeys[requestUrl] = cacheKeys;
-    
-    [self.cache setObject:self.cacheKeys forKey:LXDNetworkCacheKeys];
-}
-
-/**
- 在requestUrl这个集合中添加新的cacheKey进行保存
- 
- @param cacheKey 该次请求完整的url
- @param requestUrl 请求的url，包含baseUrl和urlString
- */
-- (void)removeCacheKey:(NSString *)cacheKey atRequestUrl:(NSString *)requestUrl {
-    if (!cacheKey || !requestUrl) {
-        return ;
-    }
-    NSMutableSet *cacheKeys = self.cacheKeys[requestUrl];
-    if (!cacheKeys) {
-        return ;
-    }
-    [cacheKeys removeObject:cacheKey];
-    if (cacheKeys.count == 0) {
-        [self.cacheKeys removeObjectForKey:requestUrl];
-    }
-    else {
-        self.cacheKeys[requestUrl] = cacheKeys;
-    }
-    [self.cache setObject:self.cacheKeys forKey:LXDNetworkCacheKeys];
-    
-    [self.cache removeObjectForKey:cacheKey];
-}
-
 
 
 @end

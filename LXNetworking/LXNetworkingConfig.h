@@ -26,11 +26,11 @@ extern const CGFloat LXRequestTimeoutInterval;
  
  - LXRequestReturnCacheDontLoad: 如果缓存有效则直接返回缓存，缓存失效则返回nil，不再load。（场景：几乎没有任何变化的接口，实效性低）
  - LXRequestReturnCacheAndLoadToCache: 如果缓存有效则直接返回缓存，并且load且缓存数据。缓存失效则load返回，且缓存数据。（场景：接口实效性不高，但需要有一定实效性，比如商品详情接口）
- - LXRequestReturnCacheOrLoadToCache: 如果缓存有效则直接返回缓存。缓存失效则load返回，且缓存数据。（场景：接口实效性不高，但需要有一定实效性，比如商品详情接口）
+ - LXRequestReturnCacheOrLoadToCache: 如果缓存有效则直接返回缓存，不再load。缓存失效则load返回，且缓存数据。（场景：接口实效性不高，但需要有一定实效性，比如商品详情接口）
  - LXRequestReturnLoadToCache: 直接load并返回数据，且缓存数据，如果load失败则读取缓存数据。（场景：接口需要一定的实效性，但同时要有数据支持，比如项目的首页接口）
  - LXRequestReturnLoadDontCache: 直接load并返回数据，不缓存数据，如果load失败则直接抛出Error。（场景：接口一定是实时的，并且保证返回的数据真实、可靠、安全，而非本地缓存数据，比如支付接口）
  */
-typedef NS_ENUM(NSUInteger, HDRequestCachePolicy) {
+typedef NS_ENUM(NSUInteger, LXRequestCachePolicy) {
     LXRequestReturnCacheDontLoad = 0,
     LXRequestReturnCacheAndLoadToCache,
     LXRequestReturnCacheOrLoadToCache,
@@ -79,9 +79,9 @@ typedef NS_ENUM(NSUInteger, HDRequestCachePolicy) {
 @property (nonatomic, assign) NSInteger resultCacheDuration;
 
 /**
- 缓存策略, 默认是HDRequestReturnLoadToCache
+ 缓存策略, 默认是LXRequestReturnCacheOrLoadToCache
  */
-@property (nonatomic, assign) HDRequestCachePolicy requestCachePolicy;
+@property (nonatomic, assign) LXRequestCachePolicy requestCachePolicy;
 
 
 /**

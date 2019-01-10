@@ -16,6 +16,7 @@
 #import <LXNetworking/LXError.h>
 #import <LXNetworking/LXNetworkingConfig.h>
 #import <LXNetworking/LXNetworkingManager.h>
+#import <LXNetworking/LXNetworkCache.h>
 
 #else
 
@@ -23,6 +24,7 @@
 #import "LXError.h"
 #import "LXNetworkingConfig.h"
 #import "LXNetworkingManager.h"
+#import "LXNetworkCache.h"
 
 #endif
 
