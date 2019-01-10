@@ -14,10 +14,10 @@ PODS:
   - AFNetworking/Serialization (3.2.1)
   - AFNetworking/UIKit (3.2.1):
     - AFNetworking/NSURLSession
-  - LXNetworking (1.0.3):
+  - LXNetworking (1.0.5):
     - AFNetworking
-    - PINCache
-  - PINCache (2.3)
+    - YYCache
+  - YYCache (1.0.4)
 
 DEPENDENCIES:
   - LXNetworking
@@ -26,12 +26,12 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - AFNetworking
     - LXNetworking
-    - PINCache
+    - YYCache
 
 SPEC CHECKSUMS:
   AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
-  LXNetworking: 71de8bb5703c5a16c19e72e0a00513d69a02cbc4
-  PINCache: ce36ed282031b92fc7733ffe831f474ff80fddc2
+  LXNetworking: 033b1d8dc3f0a333f524fd42ddbbc798b5834125
+  YYCache: 8105b6638f5e849296c71f331ff83891a4942952
 
 PODFILE CHECKSUM: 135aa49576a19c1d3a34505693f438f23897a650
 

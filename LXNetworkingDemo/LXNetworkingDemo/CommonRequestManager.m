@@ -56,16 +56,12 @@
 
 
 #pragma mark - 缓存管理
-- (void)clearRequestCache:(NSString *_Nullable)urlString {
-    [_requestConvertManager clearRequestCache:urlString];
-}
-
-- (void)clearRequestCache:(NSString *_Nullable)urlString identifier:(NSString *_Nullable)identifier {
-    [_requestConvertManager clearRequestCache:urlString identifier:identifier];
+- (void)clearRequestCache:(NSString *_Nullable)urlString parameters:(NSDictionary *_Nullable)parameters {
+    [LXNetworkCache removeHttpCacheWithUrl:urlString parameters:parameters];
 }
 
 - (void)clearAllCache {
-    [_requestConvertManager clearAllCache];
+    [LXNetworkCache removeAllHttpCache];
 }
 
 #pragma mark - 具体接口
