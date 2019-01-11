@@ -1,5 +1,5 @@
 # LXNetworking
-> 基于AFNetworking的v3.2.1进行网络请求，基于PINCache进行网络数据缓存，支持清除指定url缓存、url及参数组合缓存，通过AFNetworkActivityLogger进行网络log打印。该代码使用灵活的请求方式，不包含任何业务代码，上层支持集中式、分布式网络接口管理方式，在请求前可以对请求进行配置，也支持对网络请求后返回的数据进行统一处理。
+> 基于AFNetworking的v3.2.1进行网络请求，基于YYCache进行网络数据缓存，支持清除指定url缓存、url及参数组合缓存，通过AFNetworkActivityLogger进行网络log打印。该代码使用灵活的请求方式，不包含任何业务代码，上层支持集中式、分布式网络接口管理方式，在请求前可以对请求进行配置，也支持对网络请求后返回的数据进行统一处理。
 
 ### 一、实现功能
 
@@ -114,7 +114,7 @@ completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObj
 
 #### **5、网络数据缓存策略**：
 
-缓存这块使用的是 [PINCache](https://github.com/pinterest/PINCache) ，策略分了五种方式。
+缓存这块使用的是 YYCache ，策略分了五种方式。默认为LXRequestReturnCacheOrLoadToCache
 同时支持自定义缓存时间
 ```//设置缓存时长为100000秒
 configuration.resultCacheDuration = 100000;```
