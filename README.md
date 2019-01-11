@@ -117,7 +117,7 @@ completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObj
 缓存这块使用的是 YYCache ，策略分了五种方式。默认为LXRequestReturnCacheOrLoadToCache
 同时支持自定义缓存时间
 ```//设置缓存时长为100000秒
-configuration.resultCacheDuration = 100000;```
+configuration.resultCacheDuration = 100000;
 
  >缓存策略机制
  
@@ -126,7 +126,7 @@ configuration.resultCacheDuration = 100000;```
  - LXRequestReturnCacheOrLoadToCache: 如果缓存有效则直接返回缓存。缓存失效则load返回，且缓存数据。（场景：接口实效性不高，但需要有一定实效性，比如商品详情接口）
  - LXRequestReturnLoadToCache: 直接load并返回数据，且缓存数据，如果load失败则读取缓存数据。（场景：接口需要一定的实效性，但同时要有数据支持，比如项目的首页接口）
  - LXRequestReturnLoadDontCache: 直接load并返回数据，不缓存数据，如果load失败则直接抛出Error。（场景：接口一定是实时的，并且保证返回的数据真实、可靠、安全，而非本地缓存数据，比如支付接口）
- 
+ ```
 
 
 
