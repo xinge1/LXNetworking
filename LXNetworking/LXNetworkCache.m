@@ -55,9 +55,9 @@ static YYCache *_dataCache;
     if ([self verifyInvalidCache:cacheKey resultCacheDuration:cacheValidTime]) {
         return cache;
     }else{
-        [_dataCache.diskCache removeObjectForKey:cacheKey];
+        [_dataCache removeObjectForKey:cacheKey];
         NSString *cacheDurationKey = [NSString stringWithFormat:@"%@_%@",cacheKey, LXNetworkResponseCacheTimeOut];
-        [_dataCache.diskCache removeObjectForKey:cacheDurationKey];
+        [_dataCache removeObjectForKey:cacheDurationKey];
         return nil;
     }
     
@@ -69,10 +69,8 @@ static YYCache *_dataCache;
 
 + (void)removeAllHttpCache {
     
-    [_dataCache.diskCache removeAllObjectsWithProgressBlock:^(int removedCount, int totalCount) {
-        NSLog(@"删除数量 = %d ，总数量 = %d",removedCount , totalCount);
-    } endBlock:^(BOOL error) {
-        NSLog(@"删除http完成 = %d",error);
+    [_dataCache removeAllObjectsWithBlock:^{
+        
     }];
 }
 
@@ -80,7 +78,7 @@ static YYCache *_dataCache;
                    parameters:(NSDictionary *)parameters{
     
     NSString *cacheKey = [self cacheKeyWithURL:url parameters:[self detailNOCareParams:[self detailNOCareParams:parameters]]];
-    [_dataCache.diskCache removeObjectForKey:cacheKey withBlock:^(NSString * _Nonnull key) {
+    [_dataCache removeObjectForKey:cacheKey withBlock:^(NSString * _Nonnull key) {
         
     }];
 }
