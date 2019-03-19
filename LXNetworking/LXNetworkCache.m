@@ -30,6 +30,7 @@ static YYCache *_dataCache;
                  URL:(NSString *)URL
           parameters:(NSDictionary *)parameters{
     NSString *cacheKey = [self cacheKeyWithURL:URL parameters:[self detailNOCareParams:parameters]];
+    NSLog(@"写入缓存 [url] === [%@], [cacheKey] = [%@]",URL,cacheKey);
     //异步缓存,不会阻塞主线程
     [_dataCache setObject:httpData forKey:cacheKey withBlock:nil];
     //缓存请求过期时间
@@ -79,7 +80,7 @@ static YYCache *_dataCache;
     
     NSString *cacheKey = [self cacheKeyWithURL:url parameters:[self detailNOCareParams:[self detailNOCareParams:parameters]]];
     [_dataCache removeObjectForKey:cacheKey withBlock:^(NSString * _Nonnull key) {
-        
+        NSLog(@"key = %@",key);
     }];
 }
 

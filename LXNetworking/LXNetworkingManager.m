@@ -130,7 +130,7 @@ NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
     }
     NSString *requestUrl = [[NSURL URLWithString:URLString relativeToURL:[NSURL URLWithString:configuration.baseURL]] absoluteString];
     parameters = [self disposeRequestParameters:parameters];
-    
+    NSLog(@"请求参数 ---> %@",parameters);
     //获取缓存数据
 //    NSString *cacheKey = [requestUrl stringByAppendingString:[self serializeParams:parameters]];
     id (^ fetchCacheRespose)(void) = ^id (void) {
@@ -160,50 +160,56 @@ NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
     //存数据
     void (^ saveCacheRespose)(id responseObject) = ^(id responseObject) {
         if (configuration.resultCacheDuration > 0) {
+            NSLog(@"存数据-- ，requestUrl = [%@] , %zd , %zd",requestUrl ,configuration.resultCacheDuration , configuration.requestCachePolicy);
             [LXNetworkCache setHttpCache:responseObject URL:requestUrl parameters:parameters];
         }
     };
     
-    //接口请求
-    if (method > self.methodMap.count - 1) {
-        method = self.methodMap.count - 1;
-    }
-    NSString *methodKey = [NSString stringWithFormat:@"%d", (int)method];
-    NSURLRequest *request = [self.requestManager.requestSerializer requestWithMethod:self.methodMap[methodKey]
-                                                                           URLString:requestUrl
-                                                                          parameters:parameters
-                                                                               error:nil];
-    __weak typeof(self) weak_self = self;
-    __block NSURLSessionDataTask *dataTask = [self.requestManager dataTaskWithRequest:request
-                                                                    completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
-                                                                        
-                                                  __strong typeof(self) strong_self = weak_self;
-                                                  if (error) {
-                                                      LXError *LXError;
-                                                      if (strong_self.networkStatus == AFNetworkReachabilityStatusNotReachable) {
-                                                          LXError = [configuration.LXError lxErrorNetNotReachable];
-                                                      }
-                                                      else {
-                                                          LXError = [configuration.LXError lxErrorHttpError:error];
-                                                      }
-                                                      if (configuration.requestCachePolicy == LXRequestReturnLoadToCache) {
-                                                          id resposeObject = fetchCacheRespose();
-                                                          cache(resposeObject);
-                                                      }
-                                                      failure(dataTask, LXError);
-                                                  }
-                                                  else {
-                                                      if (configuration.requestCachePolicy != LXRequestReturnLoadDontCache) {
-                                                          saveCacheRespose(responseObject);
-                                                      }
-                                                      if (configuration.resposeHandle) {
-                                                          responseObject = configuration.resposeHandle(dataTask, responseObject);
-                                                      }
-                                                      success(dataTask, responseObject);
-                                                  }
-                                              }];
-    [dataTask resume];
-    return dataTask;
+        //接口请求
+        if (method > self.methodMap.count - 1) {
+            method = self.methodMap.count - 1;
+        }
+        NSString *methodKey = [NSString stringWithFormat:@"%d", (int)method];
+        NSMutableURLRequest *request = [self.requestManager.requestSerializer requestWithMethod:self.methodMap[methodKey]
+                                                                               URLString:requestUrl
+                                                                              parameters:parameters
+                                                                                   error:nil];
+        request.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+        __weak typeof(self) weak_self = self;
+        __block NSURLSessionDataTask *dataTask = [self.requestManager dataTaskWithRequest:request uploadProgress:nil downloadProgress:nil completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+            
+            __strong typeof(self) strong_self = weak_self;
+            if (error) {
+                LXError *LXError;
+                if (strong_self.networkStatus == AFNetworkReachabilityStatusNotReachable) {
+                    LXError = [configuration.LXError lxErrorNetNotReachable];
+                }
+                else {
+                    LXError = [configuration.LXError lxErrorHttpError:error];
+                }
+                if (configuration.requestCachePolicy == LXRequestReturnLoadToCache) {
+                    id resposeObject = fetchCacheRespose();
+                    cache(resposeObject);
+                }
+                failure(dataTask, LXError);
+            }
+            else {
+                if (configuration.requestCachePolicy != LXRequestReturnLoadDontCache) {
+                    saveCacheRespose(responseObject);
+                }
+                if (configuration.resposeHandle) {
+                    responseObject = configuration.resposeHandle(dataTask, responseObject);
+                }
+                success(dataTask, responseObject);
+            }
+            
+        }];
+        
+        [dataTask resume];
+        return dataTask;
+        
+    
+    
 }
 
 
