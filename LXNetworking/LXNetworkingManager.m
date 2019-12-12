@@ -56,7 +56,31 @@ NSString * const LXDNetworkCacheKeys = @"LXDNetworkCacheKeys";
     if (self) {
         [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
             NSLog(@"Reachability: %@", AFStringFromNetworkReachabilityStatus(status));
-            self.networkStatus = status;
+//            self.networkStatus = status;
+            /*! 当网络状态改变了, 就会调用这个block */
+            switch (status)
+            {
+                case AFNetworkReachabilityStatusUnknown:
+                    NSLog(@"未知网络");
+                    self.networkStatus = LXNetworkStatusUnknown;
+                    self.lxNetworkStatusBlock ? self.lxNetworkStatusBlock(self.networkStatus) : nil;
+                    break;
+                case AFNetworkReachabilityStatusNotReachable:
+                    NSLog(@"没有网络");
+                    self.networkStatus = LXNetworkStatusNotReachable;
+                    self.lxNetworkStatusBlock ? self.lxNetworkStatusBlock(self.networkStatus) : nil;
+                    break;
+                case AFNetworkReachabilityStatusReachableViaWWAN:
+                    NSLog(@"手机自带网络");
+                    self.networkStatus = LXNetworkStatusReachableViaWWAN;
+                    self.lxNetworkStatusBlock ? self.lxNetworkStatusBlock(self.networkStatus) : nil;
+                    break;
+                case AFNetworkReachabilityStatusReachableViaWiFi:
+                    NSLog(@"wifi 网络");
+                    self.networkStatus = LXNetworkStatusReachableViaWiFi;
+                    self.lxNetworkStatusBlock ? self.lxNetworkStatusBlock(self.networkStatus) : nil;
+                    break;
+            }
         }];
         [[AFNetworkReachabilityManager sharedManager] startMonitoring];
         
