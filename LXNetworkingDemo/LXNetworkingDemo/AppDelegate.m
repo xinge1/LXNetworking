@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "LXNetworking.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +18,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    //网络监测
+    [LXNetworkingManager sharedInstance].lxNetworkStatusBlock = ^(LXNetworkStatus status) {
+        NSLog(@"网络状态实时监测 = %zd" , status);
+    };
+    
     return YES;
 }
 

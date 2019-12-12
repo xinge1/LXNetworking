@@ -14,7 +14,7 @@ PODS:
   - AFNetworking/Serialization (3.2.1)
   - AFNetworking/UIKit (3.2.1):
     - AFNetworking/NSURLSession
-  - LXNetworking (1.0.8):
+  - LXNetworking (1.0.9):
     - AFNetworking
     - YYCache
   - YYCache (1.0.4)
@@ -30,7 +30,7 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
-  LXNetworking: eeb31f72861d56e4e24445df7f52ad172c84224e
+  LXNetworking: 63477083d0d6b60ce969a5ae448760674c77da1b
   YYCache: 8105b6638f5e849296c71f331ff83891a4942952
 
 PODFILE CHECKSUM: 135aa49576a19c1d3a34505693f438f23897a650

@@ -39,11 +39,27 @@ typedef NS_ENUM(NSInteger, LXRequestMethod) {
     LXRequestMethodDelete,
 };
 
+/**
+网络状态
+*/
+typedef NS_ENUM(NSInteger, LXNetworkStatus) {
+    /*! 未知网络 */
+    LXNetworkStatusUnknown           = 0,
+    /*! 没有网络 */
+    LXNetworkStatusNotReachable,
+    /*! 手机 3G/4G 网络 */
+    LXNetworkStatusReachableViaWWAN,
+    /*! wifi 网络 */
+    LXNetworkStatusReachableViaWiFi
+};
+
 typedef void(^LXRequestManagerCompletion)(NSURLSessionTask * _Nullable httpbase, id _Nullable cacheResponse, id _Nullable response, LXError * _Nullable error);
 typedef void(^LXRequestManagerCache)(id _Nullable responseObject);
 typedef void(^LXRequestManagerSuccess)(NSURLSessionTask * _Nullable httpbase, id _Nullable responseObject);
 typedef void(^LXRequestManagerFailure)(NSURLSessionTask * _Nullable httpbase, LXError * _Nullable error);
 typedef void(^LXRequestManagerProgress)(NSProgress * _Nullable progress);
+/*! 实时监测网络状态的 block */
+typedef void(^LXNetworkStatusBlock)(LXNetworkStatus status);
 
 /**
  网络请求中间转换类，不关心业务，将上层的请求通过该类转发给AFN、ASI等网络库，请求中的一些配置通过configuration来处理
@@ -62,6 +78,9 @@ typedef void(^LXRequestManagerProgress)(NSProgress * _Nullable progress);
  *  当前的网络状态
  */
 @property (nonatomic, assign) AFNetworkReachabilityStatus networkStatus;
+
+/// 实时网络状态监测，通过Block回调实时获取
+@property (nonatomic, copy) LXNetworkStatusBlock lxNetworkStatusBlock;
 
 
 /**
